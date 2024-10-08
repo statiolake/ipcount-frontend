@@ -1,5 +1,5 @@
 [package]
-name = "python-to-mermaid-frontend"
+name = "ipcount-frontend"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-python-to-mermaid = "0.1.0"
+anyhow = "1.0.86"
+ipcount = "0.1.0"
 wasm-bindgen = "0.2.92"

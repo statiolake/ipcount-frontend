@@ -37,8 +37,6 @@
   },
   "type": "module",
   "dependencies": {
-    "mermaid": "^10.9.1",
-    "svelte-markdown": "^0.4.1",
     "svelvet": "^10.0.2"
   }
 }

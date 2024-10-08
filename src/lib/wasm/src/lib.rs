@@ -1,31 +1,32 @@
-use python_to_mermaid::convert::{flowchart_to_mermaid, python_to_flowchart};
+use std::net::Ipv4Addr;
+
+use ipcount::{cidr::Cidr, to_addrs, to_cidrs};
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen(getter_with_clone)]
-pub struct Diagram {
-    pub name: String,
-    pub diagram: String,
+#[wasm_bindgen]
+pub fn convert_to_cidrs(addrs: Vec<String>) -> Result<Vec<String>, String> {
+    let addrs: Vec<Ipv4Addr> = addrs
+        .iter()
+        .map(|l| l.trim().parse().map_err(Into::into))
+        .collect::<anyhow::Result<Vec<Ipv4Addr>>>()
+        .map_err(|e| e.to_string())?;
+
+    Ok(to_cidrs::addrs_to_cidrs(&addrs)
+        .into_iter()
+        .map(|cidr| cidr.to_string())
+        .collect())
 }
 
 #[wasm_bindgen]
-pub fn convert(source: &str) -> Result<Vec<Diagram>, String> {
-    let fn_defs = python_to_flowchart::enumerate_fn_defs(source)
-        .map_err(|e| format!("Parse Error: {}", e))?;
+pub fn convert_to_addrs(cidrs: Vec<String>) -> Result<Vec<String>, String> {
+    let cidrs = cidrs
+        .iter()
+        .map(|l| l.trim().parse().map_err(Into::into))
+        .collect::<anyhow::Result<Vec<Cidr>>>()
+        .map_err(|e| e.to_string())?;
 
-    fn_defs
+    Ok(to_addrs::cidrs_to_addrs(&cidrs)
         .into_iter()
-        .map(|f| {
-            let name = f.name.clone();
-            let diagram = python_to_flowchart::convert(f)
-                .map(|fc| flowchart_to_mermaid::convert(&fc))
-                .map(|mfc| {
-                    let mut s = String::new();
-                    mfc.render(&mut s);
-                    s
-                })
-                .map_err(|e| format!("Conversion Error: {}", e))?;
-
-            Ok(Diagram { name, diagram })
-        })
-        .collect()
+        .map(|addr| addr.to_string())
+        .collect())
 }
